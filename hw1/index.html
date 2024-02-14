@@ -1,7 +1,233 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4,h5 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">Ethan Yu</h2>
+<h3 align="middle">https://github.com/cal-cs184-student/hw-webpages-sp24-ethanlane/blob/master/hw1/index.html</h3>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>I implemented triangle rasterization, transforms and different approaches of sampling in this homework. As a whole, I’ve built a tiny renderer for svg files—I can render triangles to simulate every image, transform the image and render it under different sample rates or sample methods. Through this homework, I’ve explored key aspects of computer graphics that are not only essential and fundamental for rendering 2D scenes, but also a base for rendering 3D scenes.</p>
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+
+<p>My algorithm first finds the minimum and maximum of x, y, and use these to set up a bound. Then take sample within the bound, check if the center of the pixel(x+.5f, y+.5f) is in the triangle by line testing(if all discriminants are <=0 or >=0, the point is inside the triangle). Notice if x or y passes the boundary of the screen, perform cutoff.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/1.png" align="middle" width="400px"/>
+        <figcaption align="middle">Overview</figcaption>
+      </td>
+      <td>
+        <img src="images/2.png" align="middle" width="400px"/>
+        <figcaption align="middle">One interesting part</figcaption>
+      </td>
+    </tr>
+    <br>
+
+  </table>
+</div>
+
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+<p>First, the image is rendered at a higher resolution. Given the sample rate, the size of the sample buffer is multiplied by the sample rate, which means each pixel in the final image is represented by #sample-rate samples. Then sample from this high-resolution image, picking the points that are inside the triangle. After that, the image is downsampled to the display resolution. The colour of each pixel is calculated by averaging the colours of those samples from the high-resolution image. No special data structure is used.
+  By rendering the triangle in supersampled space, each edge of the triangle is evaluated against a greater number of points. And each final pixel displayed is calculated taking #sample-rate samples into consideration. Its colour at edges is more detailed and smoothed but not binarized, which gives people an illusion that the triangle is of higher resolution—even if the resolution is the same.
+  At each stage of the pipeline, I modified it so that it could process sample rate that is greater than 1. Also, I decided not to use fill_pixel() for the rasterization of triangle and made it simply work for lines and dots. The triangle is dealt a little bit differently.
+  To make it plainer, I separated my code for Task 1 and Task 2, even though the code in Task 2 can fully cover the function of that in Task 1. With supersampling, the edges of triangles are smoothed. So this method can antialias the triangles. 
+  </p>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/3.png" align="middle" width="320px"/>
+          <figcaption align="middle">Sample rate=1</figcaption>
+        </td>
+        <td>
+          <img src="images/4.png" align="middle" width="320px"/>
+          <figcaption align="middle">Sample rate=4</figcaption>
+        </td>
+        <td>
+          <img src="images/5.png" align="middle" width="320px"/>
+          <figcaption align="middle">Sample rate=16</figcaption>
+        </td>
+      </tr>
+      <br>
+  
+    </table>
+  </div>
+  <p>At a very sharp angle of the triangle, in the case of sample rate=1, the angle is rendered binarily—a pixel is either totally red or totally white. In the case of sample rate=4, the angle is rendered smoother. There are many gradient colours between pure red and pure white. In the case of sample rate=16, the image is even smoother. This is because with higher sample rate, more actual points that should exist is taken into consideration, giving a more realistic image.</p>
+
+<h3 align="middle">Part 3: Transforms</h3>
+<p>The cubeman is waving while walking.</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/6.png" align="middle" width="400px"/>
+        <figcaption align="middle">Cuteman</figcaption>
+      </td>
+
+    </tr>
+    <br>
+
+  </table>
+</div>
+<h4 align="middle">Extra Task</h4>
+<p>I use key ‘Q’ and ‘E’ to rotate the viewpoint. I added a DrawRend::rotate_view(float angle) function in drawend.cpp to rotate the viewpoint, and I also modified move_view() to keep the viewpoint rotated after zooming and translating. In detail, I first translate the viewpoint to the centre of the image and then rotate it. After that I translate it back, so I can get a image that is rotated around the centre of the image.</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/7.png" align="middle" width="400px"/>
+        <figcaption align="middle">Example</figcaption>
+      </td>
+
+    </tr>
+    <br>
+
+  </table>
+</div>
+
+
+
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+<p>Barycentric coordinates offer a way for linear interpolation. In barycentric coordinates, every point is represented by the three vertices of the triangle. There are three weights α, β, γ, each means the influence that vertex have on the point, and the influence is linear. The sum of α, β and γ is 1, which ensures that the point is inside the triangle. In other words, the vector pointing to the point is represented by three vectors that each points to a vertex of the triangle. In this way, the colour at every point inside the triangle is calculated by linear process, which means colours at the vertices are mixed smoothly.</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/8.png" align="middle" width="400px"/>
+        <figcaption align="middle">Instance of Linear Interpolation</figcaption>
+      </td>
+
+    </tr>
+    <br>
+
+  </table>
+</div>
+<h4 align="middle">Image Display</h4>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/9.png" align="middle" width="400px"/>
+        <figcaption align="middle">test7.svg</figcaption>
+      </td>
+
+    </tr>
+    <br>
+
+  </table>
+</div>
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+<p>Pixel sampling refers to the process of selecting colour values from a texture and applying them to fill a shape that is drawn on the screen. I convert the coordinates in texture into barycentric coordinates in the triangle, and then use nearest sampling or bilinear sampling to sample from the texture. By barycentric interpolation, the colours of the triangle are properly calculated and filled.
+  For nearest sampling, I rounded the floating-point texture coordinates to the nearest integer values to find the closest pixel, then used that texel's colour.
+  For bilinear sampling, I identified the four texels surrounding the texture coordinate, calculated the fractional part of the texture coordinates to determine the proximity to each texel, and then performed a linear interpolation to calculate the final colour.
+  </p>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/10.png" align="middle" width="400px"/>
+          <figcaption align="middle">Sample rate=1, nearest</figcaption>
+        </td>
+        <td>
+          <img src="images/11.png" align="middle" width="400px"/>
+          <figcaption align="middle">Sample rate=1, bilinear</figcaption>
+        </td>
+      </tr>
+      <br>
+      <td>
+        <img src="images/12.png" align="middle" width="400px"/>
+        <figcaption align="middle">Sample rate=16, nearest</figcaption>
+      </td>
+      <td>
+        <img src="images/13.png" align="middle" width="400px"/>
+        <figcaption align="middle">Sample rate=16, bilinear</figcaption>
+      </td>
+  
+    </table>
+  </div>
+<p>When applying nearest sampling, the image is sharper. When applying bilinear sampling, the image is smoother and more realistic. As sample rate increases, both images go smoother and more realistic. Supersampling helps nearest to perform much better, while only help bilinear to improve a little. So when sample rate=1, the difference between nearest and bilinear is the greatest, while when sample rate=16, there’s no noticeable difference. That’s because bilinear sampling has already smoothed the image a bit by taking adjunct pixels into consideration, so supersampling does not improve that much.</p>
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+<p>Level sampling refers to the process of selecting proper levels of detail for different part of the texture when rendering a textured surface. Firstly, a set of smaller textures, known as mipmaps, is computed. Each mipmap is of lower resolution, used to render surface that is far away. Then, according to the extent of stretch in the image, which is measured by the magnitude of gradients, different levels of mipmaps are used to render the surface.</p>
+<h4 align="middle">Sampling Method Comparation</h4>
+<p align="middle">Speed</p>
+<p>Pixel sampling is the fastest. Level sampling can be fast for nearest sampling, but slower for linear sampling. Supersampling goes slower as sample rate increases.</p>
+<p align="middle">Memory Usage</p>
+<p>Pixel sampling has the lowest memory cost. Level sampling requires higher memory storage, as it has to store additional mipmaps. Supersampling requires more memory as it needs to store multiple samples for one pixel.</p>
+<p align="middle">Antialiasing Power</p>
+<p>Pixel sampling has the worst antialiasing power. Level sampling has good power, but it still can make image blurry. Supersampling has the best antialiasing power as it goes through multiple samples.</p>
+<h4 align="middle">Image Display</h4>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/14.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_ZERO, P_NEAREST</figcaption>
+      </td>
+      <td>
+        <img src="images/15.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_ZERO, P_LINEAR</figcaption>
+      </td>
+    </tr>
+    <br>
+    <td>
+      <img src="images/16.png" align="middle" width="400px"/>
+      <figcaption align="middle">L_NEAREST, P_NEAREST</figcaption>
+    </td>
+    <td>
+      <img src="images/17.png" align="middle" width="400px"/>
+      <figcaption align="middle">L_NEAREST, P_LINEAR</figcaption>
+    </td>
+
+  </table>
+</div>
+<h2 align="middle">Section III: Art Competition</h2>
+<p>None for now!</p>
+
+<h3 align="middle">Part 7: Draw something interesting!</h3>
+<p>Nothing here!</p>
+
+
+
+
+
+
+
+</body>
 </html>
