@@ -221,7 +221,22 @@
 <p>None for now!</p>
 
 <h3 align="middle">Part 7: Draw something interesting!</h3>
-<p>Nothing here!</p>
+<p>Nothing here!!!</p>
+<img id="animation" src="frame0.png" alt="Animation Frame">
+<script>
+  const frameCount = 7; // 假设你有10帧动画
+let currentFrame = 1;
+
+function updateFrame() {
+    const frame = `{currentFrame}.png`; // 构建当前帧的文件名
+    document.getElementById('animation').src = frame; // 更新<img>的src属性
+    currentFrame = (currentFrame + 1) % frameCount; // 更新帧计数器
+}
+
+// 设置定时器，例如每100毫秒更新一次帧
+setInterval(updateFrame, 100);
+</script>
+
 
 
 
