@@ -26,7 +26,7 @@
 <h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
 <h1 align="middle">Homework 1: Rasterizer</h1>
 <h2 align="middle">Ethan Yu</h2>
-<h3 align="middle">https://cal-cs184-student.github.io/hw-webpages-sp24-ethanlane/hw1/index.html</h3>
+<h3 align="middle"><a href="https://cal-cs184-student.github.io/hw-webpages-sp24-ethanlane/hw1/index.html">https://cal-cs184-student.github.io/hw-webpages-sp24-ethanlane/hw1/index.html</a></h3>
 
 <br><br>
 
@@ -218,25 +218,37 @@
   </table>
 </div>
 <h2 align="middle">Section III: Art Competition</h2>
-<p>None for now!</p>
+<p>It's a triangle world! Refering to <a href="https://github.com/fogleman/primitive">https://github.com/fogleman/primitive</a>, I found it interesting to generate such images that have a painterly quality! Translucent triangles are just like brushstrokes, and it finally gives an image looks like an Impressionist painting!</p>
 
 <h3 align="middle">Part 7: Draw something interesting!</h3>
-<p>Nothing here!!!</p>
-<img id="animation" src="frame0.png" alt="Animation Frame">
+<p>I used the programme provided in the GitHub Page to generate a series of svg files. And then I modify the svg files so that they could be interpreted by my renderer correctly. After that I made some screenshots and used them to generate an animation to be displayed on the webpage.</p>
+<p>svg files can be found in /svg/art/.., and screenshots can be find in /image/animation/... in webpage resources.</p>
+<div align="middle">
+<img id="animation" src="images/animation/0.png" alt="Animation Frame">
 <script>
-  const frameCount = 7; // 假设你有10帧动画
-let currentFrame = 1;
+  const frameCount = 13;
+  let currentFrame = 0;
 
-function updateFrame() {
-    const frame = `{currentFrame}.png`; // 构建当前帧的文件名
-    document.getElementById('animation').src = frame; // 更新<img>的src属性
-    currentFrame = (currentFrame + 1) % frameCount; // 更新帧计数器
-}
+  function updateFrame() {
+    const frame = `images/animation/${currentFrame}.png`;
+    document.getElementById('animation').src = frame; 
+    currentFrame = (currentFrame + 1) % frameCount; 
+  }
 
-// 设置定时器，例如每100毫秒更新一次帧
-setInterval(updateFrame, 100);
+  setInterval(updateFrame, 1000);
 </script>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/animation/12.png" align="middle" width="800px"/>
+        <figcaption align="middle">2048 triangle primitives</figcaption>
+      </td>
 
+
+  </table>
+</div>
+</div>
 
 
 
