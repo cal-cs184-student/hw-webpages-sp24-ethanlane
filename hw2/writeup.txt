@@ -1,0 +1,15 @@
+The algorithm repeatedly calculate points between pairs of control points by linear interpolation until there is only one single point. This point is the final point on the curve at t, and the algorithm defines the polynomial curve in this way.
+I implemented this by recursively calculating the point in-between by linear interpolation, and then call pushback() to add the point to the end of the nextLevel vector until the last point. 
+
+De Casteljau's algorithm extends to Bezier surfaces by applying the algorithm separately in two parametric directions denoted as u and v. A Bezier surface is defined by a grid of control points. First the algorithm evaluate a curve in one direction u to produce a set of intermediate points, and then evaluate another Bezier curve in another direction v using these intermediate points. 
+I first implemented evaluateStep() just the same way as a single Bezier curve. The evaluate1D function recursively applies evaluateStep() to compute a single point on a 1D Bezier curve defined by t until only one point remains. The evaluate function calculate a set of points that each represents a curve in the u direction, and then use these points to compute a new curve in the v direction. 
+
+
+Firstly record the original h, and then move the half edge h to its twin edge. Via the twin edge the normal of the face is attained, and then add it to the normal of the vertex. Then switch to the next halfedge, and then switch to its twin and repeat the process. Until the next halfedge goes back to the original h or the border does this procedure stop.
+
+
+I simply start from the selected edge and its twin to find triangle's edges, vertices and faces on both sides. And then modify the edges, vertices and faces so that the original edge is deleted and the new edge(diagonal one) is created.
+
+I simply start from the selected edge and its twin to find triangle's edges, vertices and faces on both sides. Then calculate the middle point and create new edges, vertices and faces. Similarly to Part 4, connect edges, vertices and faces properly. Finally update faces and edges, linking the new and existing edges to their corresponding halfedges. Then return the new added vertex m.
+
+I firstly compute the positions of both new and old vertices using the original mesh. And then compute the updated vertex positions associated with edges and split every edge in the mesh. Flip edges that connect one old vertex and one new vertex. Finally copy the new vertex positions into final vertex position.
